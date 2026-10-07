@@ -49,6 +49,7 @@ from orb_types.plan import Plan, PlanStatus, PlanStep
 from orb_types.reasoning import ReasoningResult
 from orb_types.robot_descriptor import RobotDescriptor
 from orb_types.robot_state import JointState, LinkState, RobotState
+from orb_types.scenario import Scenario
 from orb_types.skill import Predicate, Skill, SkillResult, SkillSpec, SkillStatus
 from orb_types.task import Task, TaskContext, TaskStatus
 from orb_types.task_result import TaskResult, TaskResultStatus
@@ -104,6 +105,7 @@ __all__ = [
     "RobotId",
     "RobotState",
     "SafetyError",
+    "Scenario",
     "SensorModality",
     "SensorReading",
     "Skill",
