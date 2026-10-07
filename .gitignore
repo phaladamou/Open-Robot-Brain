@@ -1,0 +1,67 @@
+# ─── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# ─── Virtual envs ────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ─── uv ──────────────────────────────────────────────────
+.uv/
+uv.lock
+
+# ─── Test / coverage ─────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# ─── Jupyter ─────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ─── IDE ─────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Simulation artifacts ────────────────────────────────
+*.mjcf.bak
+simulation/outputs/
+simulation/recordings/
+*.mp4
+*.gif
+
+# ─── Logs ────────────────────────────────────────────────
+*.log
+logs/
+
+# ─── Data / models (large files) ─────────────────────────
+data/raw/
+data/processed/
+models/checkpoints/
+*.ckpt
+*.pth
+*.onnx
+
+# ─── Env ─────────────────────────────────────────────────
+.env
+.env.local
