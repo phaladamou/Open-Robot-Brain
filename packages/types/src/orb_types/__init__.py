@@ -7,6 +7,7 @@ Public API is re-exported here. Import from ``orb_types`` directly:
 
 from orb_types.action import Action, ActionResult, ActionSpec, ActionStatus
 from orb_types.base import ORBModel, Timestamp, utc_now
+from orb_types.capability import Capability, CapabilityKind, CapabilitySet
 from orb_types.errors import (
     CapabilityError,
     ConfigurationError,
@@ -44,6 +45,7 @@ from orb_types.observation import (
     SensorReading,
 )
 from orb_types.robot_state import JointState, LinkState, RobotState
+from orb_types.skill import Predicate, Skill, SkillResult, SkillSpec, SkillStatus
 from orb_types.task import Task, TaskContext, TaskStatus
 from orb_types.world_state import Agent, Location, Object, Surface, WorldState
 
@@ -55,8 +57,11 @@ __all__ = [
     "ActionStatus",
     "Agent",
     "AgentId",
+    "Capability",
     "CapabilityError",
     "CapabilityId",
+    "CapabilityKind",
+    "CapabilitySet",
     "ConfigurationError",
     "EventId",
     "ExecutionError",
@@ -81,13 +86,18 @@ __all__ = [
     "PlanningError",
     "Pose",
     "PreconditionError",
+    "Predicate",
     "Quaternion",
     "RobotId",
     "RobotState",
     "SafetyError",
     "SensorModality",
     "SensorReading",
+    "Skill",
     "SkillId",
+    "SkillResult",
+    "SkillSpec",
+    "SkillStatus",
     "Surface",
     "Task",
     "TaskContext",
