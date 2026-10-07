@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import structlog
 from orb_runtime import EventBus, StateStore
+from orb_runtime.events.bus import Subscription
 from orb_types import (
     Event,
     EventKind,
@@ -63,7 +64,7 @@ class WorldModel:
         self._bus = bus
         self._store = store
         self._threshold = float(confidence_threshold)
-        self._subscription: object | None = None
+        self._subscription: Subscription | None = None
         self._running = False
 
     # ─── Lifecycle ──────────────────────────────────────────────────────
@@ -84,7 +85,7 @@ class WorldModel:
         if not self._running:
             return
         if self._subscription is not None:
-            self._bus.unsubscribe(self._subscription)  # type: ignore[arg-type]
+            self._bus.unsubscribe(self._subscription)
             self._subscription = None
         self._running = False
         logger.info("world_model.stopped")
