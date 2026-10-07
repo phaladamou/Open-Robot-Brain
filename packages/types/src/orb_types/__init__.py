@@ -18,6 +18,13 @@ from orb_types.errors import (
     ValidationError,
     VerificationError,
 )
+from orb_types.geometry import (
+    FiniteFloat,
+    Pose,
+    Quaternion,
+    Transform,
+    Vec3,
+)
 from orb_types.ids import (
     ActionId,
     AgentId,
@@ -34,33 +41,54 @@ from orb_types.ids import (
     WorldModelId,
     new_id,
 )
+from orb_types.robot_state import JointState, LinkState, RobotState
+from orb_types.world_state import (
+    Agent,
+    Location,
+    Object,
+    Surface,
+    WorldState,
+)
 
 __all__ = [
     "ActionId",
+    "Agent",
     "AgentId",
     "CapabilityError",
     "CapabilityId",
     "ConfigurationError",
     "EventId",
     "ExecutionError",
+    "FiniteFloat",
     "GoalId",
+    "JointState",
+    "LinkState",
+    "Location",
     "MemoryId",
     "NotFoundError",
     "ORBError",
     "ORBModel",
+    "Object",
     "ObjectId",
     "ObservationId",
     "PlanId",
     "PlanningError",
+    "Pose",
     "PreconditionError",
+    "Quaternion",
     "RobotId",
+    "RobotState",
     "SafetyError",
     "SkillId",
+    "Surface",
     "TaskId",
     "Timestamp",
+    "Transform",
     "ValidationError",
+    "Vec3",
     "VerificationError",
     "WorldModelId",
+    "WorldState",
     "new_id",
     "utc_now",
 ]

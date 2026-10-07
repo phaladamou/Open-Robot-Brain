@@ -59,7 +59,12 @@ select = [
     "RUF",          # ruff-specific
     "ANN",          # annotations
 ]
-ignore = ["ANN101", "ANN102", "ANN401"]
+ignore = [
+    "ANN401",  # Any type allowed for **kwargs-style APIs
+]
+# ANN101/ANN102 were removed in ruff 0.9+; harmless to keep them out of selection
+# for older ruff versions used by pre-commit.
+extend-ignore = ["ANN101", "ANN102"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN", "S101"]
