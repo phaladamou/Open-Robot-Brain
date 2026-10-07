@@ -45,9 +45,11 @@ from orb_types.observation import (
     SensorModality,
     SensorReading,
 )
+from orb_types.plan import Plan, PlanStatus, PlanStep
 from orb_types.robot_state import JointState, LinkState, RobotState
 from orb_types.skill import Predicate, Skill, SkillResult, SkillSpec, SkillStatus
 from orb_types.task import Task, TaskContext, TaskStatus
+from orb_types.task_result import TaskResult, TaskResultStatus
 from orb_types.world_state import Agent, Location, Object, Surface, WorldState
 
 __all__ = [
@@ -86,7 +88,10 @@ __all__ = [
     "Observation",
     "ObservationId",
     "ObservationKind",
+    "Plan",
     "PlanId",
+    "PlanStatus",
+    "PlanStep",
     "PlanningError",
     "Pose",
     "PreconditionError",
@@ -106,6 +111,8 @@ __all__ = [
     "Task",
     "TaskContext",
     "TaskId",
+    "TaskResult",
+    "TaskResultStatus",
     "TaskStatus",
     "Timestamp",
     "Transform",
