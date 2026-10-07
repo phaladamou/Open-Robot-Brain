@@ -20,6 +20,7 @@ from orb_types.errors import (
     ValidationError,
     VerificationError,
 )
+from orb_types.event import Event, EventKind, EventSeverity
 from orb_types.geometry import FiniteFloat, Pose, Quaternion, Transform, Vec3
 from orb_types.goal import Goal, GoalKind, GoalStatus
 from orb_types.ids import (
@@ -63,7 +64,10 @@ __all__ = [
     "CapabilityKind",
     "CapabilitySet",
     "ConfigurationError",
+    "Event",
     "EventId",
+    "EventKind",
+    "EventSeverity",
     "ExecutionError",
     "FiniteFloat",
     "Goal",
