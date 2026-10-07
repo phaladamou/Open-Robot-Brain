@@ -47,6 +47,7 @@ from orb_types.observation import (
 )
 from orb_types.plan import Plan, PlanStatus, PlanStep
 from orb_types.reasoning import ReasoningResult
+from orb_types.robot_descriptor import RobotDescriptor
 from orb_types.robot_state import JointState, LinkState, RobotState
 from orb_types.skill import Predicate, Skill, SkillResult, SkillSpec, SkillStatus
 from orb_types.task import Task, TaskContext, TaskStatus
@@ -99,6 +100,7 @@ __all__ = [
     "Predicate",
     "Quaternion",
     "ReasoningResult",
+    "RobotDescriptor",
     "RobotId",
     "RobotState",
     "SafetyError",
