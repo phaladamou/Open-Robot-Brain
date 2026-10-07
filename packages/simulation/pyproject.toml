@@ -1,0 +1,29 @@
+[project]
+name = "orb-simulation"
+version = "0.1.0.dev0"
+description = "Simulation backends for Open Robot Brain — mock, MuJoCo, and future Isaac support."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [{ name = "Phal Adamou" }]
+dependencies = [
+    "orb-types",
+    "orb-interfaces",
+]
+
+[project.optional-dependencies]
+mujoco = ["mujoco>=3.2"]
+
+[tool.uv.sources]
+orb-types = { workspace = true }
+orb-interfaces = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/orb_simulation"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/orb_simulation/py.typed" = "orb_simulation/py.typed"

@@ -25,6 +25,7 @@ members = [
     "packages/runtime",
     "packages/brain",
     "packages/embodiment",
+    "packages/simulation",
 ]
 
 [tool.uv.sources]
@@ -34,6 +35,7 @@ orb-sdk = { workspace = true }
 orb-runtime = { workspace = true }
 orb-brain = { workspace = true }
 orb-embodiment = { workspace = true }
+orb-simulation = { workspace = true }
 
 # ─── Dev dependencies (root) ─────────────────────────────
 [dependency-groups]
