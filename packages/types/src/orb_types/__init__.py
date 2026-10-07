@@ -19,13 +19,8 @@ from orb_types.errors import (
     ValidationError,
     VerificationError,
 )
-from orb_types.geometry import (
-    FiniteFloat,
-    Pose,
-    Quaternion,
-    Transform,
-    Vec3,
-)
+from orb_types.geometry import FiniteFloat, Pose, Quaternion, Transform, Vec3
+from orb_types.goal import Goal, GoalKind, GoalStatus
 from orb_types.ids import (
     ActionId,
     AgentId,
@@ -49,6 +44,7 @@ from orb_types.observation import (
     SensorReading,
 )
 from orb_types.robot_state import JointState, LinkState, RobotState
+from orb_types.task import Task, TaskContext, TaskStatus
 from orb_types.world_state import Agent, Location, Object, Surface, WorldState
 
 __all__ = [
@@ -65,7 +61,10 @@ __all__ = [
     "EventId",
     "ExecutionError",
     "FiniteFloat",
+    "Goal",
     "GoalId",
+    "GoalKind",
+    "GoalStatus",
     "JointState",
     "LinkState",
     "Location",
@@ -90,7 +89,10 @@ __all__ = [
     "SensorReading",
     "SkillId",
     "Surface",
+    "Task",
+    "TaskContext",
     "TaskId",
+    "TaskStatus",
     "Timestamp",
     "Transform",
     "ValidationError",
