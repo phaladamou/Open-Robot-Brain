@@ -18,12 +18,18 @@ classifiers = [
 
 # ─── Workspace (uv) ──────────────────────────────────────
 [tool.uv.workspace]
-members = ["packages/*"]
+members = [
+    "packages/types",
+    "packages/interfaces",
+    "packages/sdk",
+    "packages/runtime",
+]
 
 [tool.uv.sources]
 orb-types = { workspace = true }
 orb-interfaces = { workspace = true }
 orb-sdk = { workspace = true }
+orb-runtime = { workspace = true }
 
 # ─── Dev dependencies (root) ─────────────────────────────
 [dependency-groups]

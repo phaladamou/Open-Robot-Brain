@@ -19,10 +19,12 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+  - repo: local
     hooks:
       - id: mypy
-        additional_dependencies: [pydantic>=2.9, structlog>=24.4, pytest>=9.0]
-        args: [--strict]
-        files: ^(packages|brain|runtime|protocols)/
+        name: mypy (via uv)
+        entry: uv run mypy
+        language: system
+        types_or: [python, pyi]
+        args: [packages]
+        pass_filenames: false

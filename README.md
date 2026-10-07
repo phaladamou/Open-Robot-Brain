@@ -41,8 +41,8 @@ Today's robots are tightly coupled to their hardware. A model, a controller, a s
 
 The fundamental architectural principle:
 
-> **The Brain does not know the robot.  
-> It knows the world, goals, capabilities, skills, and constraints.**  
+> **The Brain does not know the robot.
+> It knows the world, goals, capabilities, skills, and constraints.**
 > The embodiment layer knows the robot.
 
 ```text
@@ -598,7 +598,7 @@ simulation/
 
 Enables: rapid experimentation, reproducible tests, large-scale evaluation, RL, skill testing, failure analysis, multi-robot experiments.
 
-> **The first goal is not to build a physical robot.  
+> **The first goal is not to build a physical robot.
 > The first goal is to build a brain capable of operating robots.**
 
 ---
@@ -860,7 +860,7 @@ A world where robotic intelligence is **not locked inside individual machines**.
       Body             Body            Body
 ```
 
-> **The body becomes an embodiment.  
+> **The body becomes an embodiment.
 > The intelligence becomes a platform.**
 
 ---
