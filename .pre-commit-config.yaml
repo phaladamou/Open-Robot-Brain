@@ -23,6 +23,6 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
-        additional_dependencies: [pydantic>=2.9, structlog>=24.4]
+        additional_dependencies: [pydantic>=2.9, structlog>=24.4, pytest>=9.0]
         args: [--strict]
         files: ^(packages|brain|runtime|protocols)/
