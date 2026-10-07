@@ -1,0 +1,38 @@
+[project]
+name = "orb-apps-simulator"
+version = "0.1.0.dev0"
+description = "Reference simulator app for Open Robot Brain."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [{ name = "Phal Adamou" }]
+dependencies = [
+    "orb-types",
+    "orb-interfaces",
+    "orb-runtime",
+    "orb-brain",
+    "orb-embodiment",
+    "orb-simulation",
+    "structlog>=24.4",
+]
+
+[project.scripts]
+orb-simulator = "orb_apps_simulator.cli:main"
+
+[tool.uv.sources]
+orb-types = { workspace = true }
+orb-interfaces = { workspace = true }
+orb-runtime = { workspace = true }
+orb-brain = { workspace = true }
+orb-embodiment = { workspace = true }
+orb-simulation = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/orb_apps_simulator"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/orb_apps_simulator/py.typed" = "orb_apps_simulator/py.typed"

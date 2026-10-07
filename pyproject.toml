@@ -26,6 +26,7 @@ members = [
     "packages/brain",
     "packages/embodiment",
     "packages/simulation",
+    "packages/apps/simulator",
 ]
 
 [tool.uv.sources]
@@ -36,6 +37,7 @@ orb-runtime = { workspace = true }
 orb-brain = { workspace = true }
 orb-embodiment = { workspace = true }
 orb-simulation = { workspace = true }
+orb-apps-simulator = { workspace = true }
 
 # ─── Dev dependencies (root) ─────────────────────────────
 [dependency-groups]
@@ -79,6 +81,7 @@ ignore = [
 extend-ignore = ["ANN101", "ANN102"]
 
 [tool.ruff.lint.per-file-ignores]
+"packages/apps/simulator/src/**" = ["T201"]
 "tests/**" = ["ANN", "S101"]
 "docs/**" = ["ANN"]
 
