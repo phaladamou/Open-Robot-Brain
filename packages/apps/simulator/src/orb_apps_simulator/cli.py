@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections.abc import Sequence
 
-from orb_simulation import SCENARIOS
+import structlog
+from orb_simulation import SCENARIOS, benchmark
 from orb_types import RunResult, RunStatus
 
 from orb_apps_simulator.runner import run_scenario
+
+BENCHMARK_RUNS: int = 5
+"""Runs per scenario in ``--benchmark`` mode."""
 
 
 def _format_summary(result: RunResult) -> str:
@@ -59,7 +64,29 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="List available scenarios and exit.",
     )
+    p.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="Run all scenarios repeatedly and print a JSON report.",
+    )
     return p
+
+
+def _run_benchmark() -> int:
+    """Run the benchmark and print pure JSON on stdout.
+
+    Logs are redirected to stderr so stdout stays diffable JSON, then
+    the default configuration is restored so in-process callers (tests)
+    are unaffected. Always exits 0: a benchmark measures, it does not
+    gate.
+    """
+    structlog.configure(logger_factory=structlog.PrintLoggerFactory(file=sys.stderr))
+    try:
+        report = benchmark(list(SCENARIOS), BENCHMARK_RUNS, run=run_scenario)
+        print(json.dumps(report, indent=2, sort_keys=True))
+    finally:
+        structlog.reset_defaults()
+    return 0
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -71,6 +98,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         for name in SCENARIOS:
             print(f"  - {name}")
         return 0
+
+    if args.benchmark:
+        return _run_benchmark()
 
     result = run_scenario(args.scenario)
     print(_format_summary(result))
