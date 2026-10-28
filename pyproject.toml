@@ -136,3 +136,30 @@ exclude_lines = [
     "raise NotImplementedError",
     "@abstractmethod",
 ]
+
+# ─── Import Linter ─────────────────────────────────────────
+# Architectural non-negotiable #1: the brain never imports
+# embodiment, simulation, or apps. orb_control / orb_robots join
+# forbidden_modules when those packages gain importable code
+# (packages/control and packages/robots are placeholders today).
+[tool.importlinter]
+root_packages = [
+    "orb_apps_simulator",
+    "orb_brain",
+    "orb_embodiment",
+    "orb_interfaces",
+    "orb_runtime",
+    "orb_sdk",
+    "orb_simulation",
+    "orb_types",
+]
+
+[[tool.importlinter.contracts]]
+name = "brain-isolated-from-embodiment"
+type = "forbidden"
+source_modules = ["orb_brain"]
+forbidden_modules = [
+    "orb_apps_simulator",
+    "orb_embodiment",
+    "orb_simulation",
+]
