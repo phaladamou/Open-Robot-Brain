@@ -14,6 +14,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-early%20research-orange" alt="Status"/>
+  <img src="https://github.com/phaladamou/Open-Robot-Brain/actions/workflows/ci.yml/badge.svg" alt="CI"/>
   <img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"/>
   <img src="https://img.shields.io/badge/python-3.11+-blue" alt="Python"/>
   <img src="https://img.shields.io/badge/sim-MuJoCo%20%7C%20Isaac%20Lab-green" alt="Simulation"/>
@@ -24,6 +25,7 @@
   <a href="#vision">Vision</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#roadmap">Roadmap</a> •
+  <a href="#v02-highlights">v0.2 Highlights</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#related-work">Related Work</a> •
   <a href="#contributing">Contributing</a>
@@ -763,8 +765,8 @@ grasp() → verification → FAILED → recovery → new grasp strategy → retr
 
 | Version | Milestone | Status |
 |---|---|---|
-| **v0.1** | Cognitive core (world model, reasoning, planning, skills, memory, runtime) + 1 simulated robot | 🚧 In progress |
-| **v0.2** | Multi-embodiment — same goal, 2+ simulated robots through the same interface | ⏳ Planned |
+| **v0.1** | Cognitive core (world model, reasoning, planning, skills, memory, runtime) + 1 simulated robot | ✅ Done |
+| **v0.2** | Multi-embodiment (3 bodies, same brain) + real MuJoCo backend + perception loop + benchmark harness | ✅ Done |
 | **v0.3** | Cross-embodiment skill transfer — `open_drawer()` from Robot A → Robot B | ⏳ Planned |
 | **v0.4** | Learning loop — demonstrations, imitation, first skill learning pipeline | ⏳ Planned |
 | **v0.5** | Benchmark suite + evaluation harness | ⏳ Planned |
@@ -772,20 +774,56 @@ grasp() → verification → FAILED → recovery → new grasp strategy → retr
 
 ---
 
-## Quick Start
+## v0.2 Highlights
 
-> ⚠️ **Under construction.** The first runnable demo targets **v0.1**.
-> In the meantime, you can clone the repo and explore the architecture and docs.
+452 tests · 8 packages · 7 scenarios · `ruff` + `mypy --strict` clean ·
+CI blocking and green on Python 3.11/3.12.
+
+- **Real MuJoCo backend** — `MujocoAdapter` drives a self-contained 6-DOF
+  arm (`arm_6dof.xml`) with true dynamics; optional `mujoco` extra, mock
+  simulator by default.
+- **Real perception loop** — a seeded `MockSensor` ticks 3 times before
+  planning; `WorldModel` absorbs observations off the bus into the
+  `StateStore`, so reasoning plans on perceived state, not ground truth.
+- **Cross-embodiment** — same brain, 3 bodies: full arm (4-step pick),
+  short arm (5-step pick with base docking), weak arm (explicit
+  `missing capability 'can_lift'` refusal).
+- **Architectural guard** — brain isolation enforced twice: an
+  `import-linter` contract gates CI, an AST boundary test gates every
+  local `pytest` run.
+- **Reproducible benchmark** — `benchmark()` + `--benchmark` JSON mode
+  (success rate vs. expected status, mean/p95 durations).
+
+```text
+v0.2 pipeline (per scenario, fully deterministic):
+
+  "pick the red cube"
+         │
+         ▼
+  ┌────────────┐  3 seeded ticks   ┌────────────┐
+  │ MockSensor │ ── observations ─▶ │ WorldModel │ ──▶ StateStore.world
+  └────────────┘    (event bus)    └────────────┘          │
+                                                          ▼
+              GoalParser → Reasoner → HtnPlanner → Executor → skills
+                              │            │
+                    capabilities?    capabilities?
+                              │            │
+                 weak arm: REFUSED   short arm: 5 steps (dock)
+                 "missing 'can_lift'"  full arm: 4 steps
+```
+
+---
+
+## Quick Start
 
 ```bash
 git clone https://github.com/phaladamou/Open-Robot-Brain.git
 cd Open-Robot-Brain
-```
-
-```text
-Coming soon:
-  make install
-  make demo
+uv sync --all-packages
+uv run python -m orb_apps_simulator              # demo: pick_red_cube
+uv run python -m orb_apps_simulator --list       # 7 scenarios
+uv run python -m orb_apps_simulator --benchmark  # JSON report
+uv run pytest packages -q                        # 452 tests
 ```
 
 ---
@@ -867,6 +905,8 @@ A world where robotic intelligence is **not locked inside individual machines**.
 🚧 **Early research / experimental**
 
 The architecture is developed incrementally, beginning with simulation and software infrastructure before physical hardware integration.
+
+Selected for the **XERJ Corpus Hub** — a curated corpus of high-quality open-source repositories.
 
 ---
 
