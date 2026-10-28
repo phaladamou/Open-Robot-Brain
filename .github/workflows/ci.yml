@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Quality (ruff + mypy + tests)
+    name: Quality (ruff + mypy + imports + tests)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -42,6 +42,9 @@ jobs:
 
       - name: Mypy (strict)
         run: uv run mypy packages
+
+      - name: Lint imports
+        run: uv run lint-imports
 
       - name: Pytest
         run: uv run pytest --cov --cov-report=term-missing
