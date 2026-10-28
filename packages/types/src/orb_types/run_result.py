@@ -29,6 +29,8 @@ class RunResult(ORBModel):
     plan: Plan | None = None
     task_result: TaskResult | None = None
     message: str | None = None
+    observations_applied: int = Field(ge=0, default=0)
+    """Observations applied by the world model during perception."""
 
 
 __all__ = ["RunResult", "RunStatus"]
