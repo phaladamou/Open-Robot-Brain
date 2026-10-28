@@ -3,6 +3,7 @@
 Public API is re-exported here.
 """
 
+from orb_simulation.benchmarks import BenchmarkReport, benchmark
 from orb_simulation.environments import (
     empty,
     kitchen_simple,
@@ -15,8 +16,10 @@ from orb_simulation.sensors import MockSensor
 
 __all__ = [
     "SCENARIOS",
+    "BenchmarkReport",
     "MockSensor",
     "MockSimulator",
+    "benchmark",
     "empty",
     "get_scenario",
     "kitchen_simple",
