@@ -7,6 +7,10 @@ from typing import Any
 from orb_runtime.events.bus import EventBus
 from orb_runtime.executor.executor import Executor
 from orb_types import (
+    Capability,
+    CapabilityId,
+    CapabilityKind,
+    CapabilitySet,
     Event,
     EventKind,
     Goal,
@@ -34,9 +38,17 @@ class FakePlanner:
         self._plan = plan
         self._raises = raises
         self.calls = 0
+        self.last_capabilities: CapabilitySet | None = None
 
-    def plan(self, goal: Goal, world: WorldState) -> Plan:
+    def plan(
+        self,
+        goal: Goal,
+        world: WorldState,
+        *,
+        capabilities: CapabilitySet | None = None,
+    ) -> Plan:
         self.calls += 1
+        self.last_capabilities = capabilities
         if self._raises is not None:
             raise self._raises
         assert self._plan is not None
@@ -100,6 +112,24 @@ def _plan(*skill_ids: str) -> Plan:
 
 
 # ─── Success path ────────────────────────────────────────────────────────
+
+
+def test_executor_forwards_capabilities_to_planner() -> None:
+    bus = EventBus()
+    planner = FakePlanner(_plan())
+    ex = Executor(bus, planner=planner, skills=FakeSkillRegistry())
+    caps = CapabilitySet(
+        capabilities=(
+            Capability(
+                capability_id=CapabilityId("can_grasp"),
+                name="grasp",
+                kind=CapabilityKind.MANIPULATION,
+            ),
+        )
+    )
+    result = ex.execute(_task(), capabilities=caps)
+    assert result.status is TaskResultStatus.SUCCEEDED
+    assert planner.last_capabilities is caps
 
 
 def test_executor_empty_plan_succeeds() -> None:

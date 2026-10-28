@@ -13,6 +13,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from orb_types import (
+    CapabilitySet,
     Goal,
     ObjectId,
     Plan,
@@ -90,6 +91,23 @@ def _rule_pick(goal: Goal, world: WorldState) -> tuple[PlanStep, ...]:
         _step(2, "reach", object_id=str(object_id)),
         _step(3, "grasp", object_id=str(object_id)),
         _step(4, "lift", object_id=str(object_id)),
+    )
+
+
+def _rule_pick_short_arm(goal: Goal, world: WorldState) -> tuple[PlanStep, ...]:
+    """Pick decomposition for a body without ``can_reach_far``.
+
+    Same goal, different strategy: the base first approaches the object,
+    then docks precisely so the short arm can reach it. v0.1 skills do
+    not consume the ``leg`` annotation; it documents the plan.
+    """
+    object_id = _resolve_object(goal, world)
+    return (
+        _step(1, "navigate_to", object_id=str(object_id), leg="approach"),
+        _step(2, "navigate_to", object_id=str(object_id), leg="dock"),
+        _step(3, "reach", object_id=str(object_id)),
+        _step(4, "grasp", object_id=str(object_id)),
+        _step(5, "lift", object_id=str(object_id)),
     )
 
 
@@ -174,8 +192,18 @@ class HtnPlanner:
         """Return whether the planner has a rule for this goal."""
         return goal.predicate in self._rules
 
-    def plan(self, goal: Goal, world: WorldState) -> Plan:
+    def plan(
+        self,
+        goal: Goal,
+        world: WorldState,
+        *,
+        capabilities: CapabilitySet | None = None,
+    ) -> Plan:
         """Return a plan for the given goal and world.
+
+        When ``capabilities`` is given and lacks ``can_reach_far``, pick
+        goals decompose through base repositioning
+        (:func:`_rule_pick_short_arm`). ``None`` assumes a full body.
 
         Raises
         ------
@@ -191,6 +219,14 @@ class HtnPlanner:
                 goal_id=str(goal.goal_id),
             )
         rule = self._rules[predicate]
+        if (
+            # Adaptation applies to the standard pick rule only; custom
+            # rules own their own strategy.
+            rule is _rule_pick
+            and capabilities is not None
+            and not capabilities.has("can_reach_far")
+        ):
+            rule = _rule_pick_short_arm
         steps = rule(goal, world)
         return Plan(
             plan_id=PlanId(new_id("plan")),

@@ -13,15 +13,26 @@ from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
 
-from orb_types import Goal, Plan, WorldState
+from orb_types import CapabilitySet, Goal, Plan, WorldState
 
 
 @runtime_checkable
 class Planner(Protocol):
     """Protocol for goal-to-plan planners."""
 
-    def plan(self, goal: Goal, world: WorldState) -> Plan:
+    def plan(
+        self,
+        goal: Goal,
+        world: WorldState,
+        *,
+        capabilities: CapabilitySet | None = None,
+    ) -> Plan:
         """Return a plan for the given goal and world.
+
+        ``capabilities`` lets the planner adapt its strategy to the body
+        (e.g. route a short arm through extra repositioning). ``None``
+        means "assume a fully capable body" and preserves the legacy
+        behavior.
 
         Implementations may raise :class:`~orb_types.PlanningError` when no
         valid plan can be produced. Returning an empty plan is allowed and

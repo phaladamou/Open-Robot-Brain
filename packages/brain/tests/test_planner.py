@@ -5,6 +5,10 @@ from __future__ import annotations
 import pytest
 from orb_brain.planning import HtnPlanner
 from orb_types import (
+    Capability,
+    CapabilityId,
+    CapabilityKind,
+    CapabilitySet,
     Goal,
     GoalId,
     GoalKind,
@@ -251,6 +255,79 @@ def test_custom_rules_replace_defaults(world: WorldState) -> None:
     plan = planner.plan(_goal(predicate="pick", args={"object_type": "cup"}), world)
     assert len(plan.steps) == 1
     assert plan.steps[0].skill_id == "noop"
+
+
+# ─── Capability adaptation ───────────────────────────────────────────────
+
+
+def _capabilities(*names: str) -> CapabilitySet:
+    return CapabilitySet(
+        capabilities=tuple(
+            Capability(
+                capability_id=CapabilityId(name),
+                name=name.removeprefix("can_"),
+                kind=CapabilityKind.OTHER,
+            )
+            for name in names
+        )
+    )
+
+
+_FULL = (
+    "can_navigate",
+    "can_manipulate",
+    "can_grasp",
+    "can_lift",
+    "can_see",
+    "can_reach_far",
+)
+
+
+def test_pick_with_full_capabilities_uses_standard_rule(
+    planner: HtnPlanner, world: WorldState
+) -> None:
+    plan = planner.plan(_goal(), world, capabilities=_capabilities(*_FULL))
+    assert [s.skill_id for s in plan.steps] == ["navigate_to", "reach", "grasp", "lift"]
+
+
+def test_pick_without_capabilities_assumes_full_body(
+    planner: HtnPlanner, world: WorldState
+) -> None:
+    plan = planner.plan(_goal(), world, capabilities=None)
+    assert len(plan.steps) == 4
+
+
+def test_pick_without_reach_far_adds_docking_leg(planner: HtnPlanner, world: WorldState) -> None:
+    short = _capabilities(*(c for c in _FULL if c != "can_reach_far"))
+    plan = planner.plan(_goal(), world, capabilities=short)
+    assert [s.skill_id for s in plan.steps] == [
+        "navigate_to",
+        "navigate_to",
+        "reach",
+        "grasp",
+        "lift",
+    ]
+    assert plan.steps[0].parameters.get("leg") == "approach"
+    assert plan.steps[1].parameters.get("leg") == "dock"
+
+
+def test_non_pick_rule_ignores_capabilities(planner: HtnPlanner, world: WorldState) -> None:
+    short = _capabilities(*(c for c in _FULL if c != "can_reach_far"))
+    goal = _goal(predicate="open", args={"object_type": "drawer"})
+    plan = planner.plan(goal, world, capabilities=short)
+    assert [s.skill_id for s in plan.steps] == ["navigate_to", "reach", "pull"]
+
+
+def test_custom_pick_rule_not_overridden(world: WorldState) -> None:
+    from orb_types import PlanStep, SkillId
+
+    def custom(goal: Goal, w: WorldState) -> tuple[PlanStep, ...]:
+        return (PlanStep(step_id="only", skill_id=SkillId("noop")),)
+
+    short = _capabilities(*(c for c in _FULL if c != "can_reach_far"))
+    planner = HtnPlanner(rules={"pick": custom})
+    plan = planner.plan(_goal(), world, capabilities=short)
+    assert [s.skill_id for s in plan.steps] == ["noop"]
 
 
 # ─── Plan invariants ─────────────────────────────────────────────────────

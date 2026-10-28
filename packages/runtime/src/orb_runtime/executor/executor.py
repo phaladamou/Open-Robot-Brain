@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from orb_interfaces import Planner, SkillRegistry
 from orb_types import (
+    CapabilitySet,
     Event,
     EventId,
     EventKind,
@@ -64,7 +65,13 @@ class Executor:
 
     # ─── Public API ─────────────────────────────────────────────────────
 
-    def execute(self, task: Task, *, world: WorldState | None = None) -> TaskResult:
+    def execute(
+        self,
+        task: Task,
+        *,
+        world: WorldState | None = None,
+        capabilities: CapabilitySet | None = None,
+    ) -> TaskResult:
         """Execute the given task and return its result.
 
         Parameters
@@ -75,6 +82,9 @@ class Executor:
             The world state against which planning and skill execution run.
             Defaults to a fresh empty world (v0.1 placeholder until the
             executor is wired to the ``StateStore``).
+        capabilities:
+            The body's capabilities, forwarded to the planner so it can
+            adapt its strategy. ``None`` assumes a full body.
 
         Steps:
 
@@ -94,7 +104,7 @@ class Executor:
 
         # ─── Plan ───────────────────────────────────────────────────────
         try:
-            plan = self._planner.plan(task.goal, world)
+            plan = self._planner.plan(task.goal, world, capabilities=capabilities)
         except Exception as exc:
             self._publish_plan_failed(task, exc, correlation_id=correlation_id)
             return TaskResult(
