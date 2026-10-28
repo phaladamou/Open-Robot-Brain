@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+import importlib.util
+from pathlib import Path
+
 import pytest
 from orb_interfaces import Simulator
 from orb_simulation import MockSimulator
+
+MODEL_PATH = Path(__file__).resolve().parents[1] / "robots" / "arm_6dof.xml"
 
 # ─── Construction ────────────────────────────────────────────────────────
 
@@ -135,11 +140,13 @@ def test_mock_simulator_is_simulator() -> None:
     assert isinstance(sim, Simulator)
 
 
-# ─── MuJoCo adapter (stub) ──────────────────────────────────────────────
+# ─── MuJoCo adapter (optional dependency) ─────────────────────────────────
 
 
 def test_mujoco_adapter_raises_without_mujoco() -> None:
+    if importlib.util.find_spec("mujoco") is not None:
+        pytest.skip("mujoco is installed; ImportError path not exercised")
     from orb_simulation.adapters import MujocoAdapter
 
-    with pytest.raises((ImportError, NotImplementedError)):
-        MujocoAdapter("some/path.xml")
+    with pytest.raises(ImportError, match="not installed"):
+        MujocoAdapter(MODEL_PATH)
