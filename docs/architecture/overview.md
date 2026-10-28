@@ -93,6 +93,32 @@ Goal (natural language)
 
 ---
 
+## Cross-Embodiment: Same Brain, Different Bodies, Different Plans
+
+The brain never sees motors — it sees capabilities. That is what makes
+"one brain, many bodies" executable rather than aspirational. v0.1 ships
+three bodies (`orb_embodiment.adapters.profiles`), all driven by the
+same pipeline:
+
+| Body | Differs by | `pick the red cube` |
+|---|---|---|
+| `mock` (full arm) | reference | 4 steps: navigate → reach → grasp → lift |
+| `short_arm` | no `can_reach_far` | 5 steps: navigate → navigate (dock) → reach → grasp → lift |
+| `weak_arm` | no `can_lift` | refused: `missing capability 'can_lift'` |
+
+Two layers adapt, with a clean split of responsibility:
+
+- The **reasoner** judges feasibility: a goal the body cannot achieve
+  is refused with an explicit error (`pick_red_cube_no_lift`).
+- The **planner** adapts strategy: a goal the body can achieve *with
+  effort* gets a different decomposition
+  (`pick_red_cube_short_arm` succeeds through base repositioning).
+
+v0.1 bodies differ by capability set only; per-robot geometry arrives
+with dedicated MuJoCo models.
+
+---
+
 ## Design Invariants
 
 These are non-negotiable across the codebase:
