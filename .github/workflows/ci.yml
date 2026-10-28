@@ -42,8 +42,6 @@ jobs:
 
       - name: Mypy (strict)
         run: uv run mypy packages
-        continue-on-error: true
 
       - name: Pytest
         run: uv run pytest --cov --cov-report=term-missing
-        continue-on-error: true
