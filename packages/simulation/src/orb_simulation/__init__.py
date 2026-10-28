@@ -11,9 +11,11 @@ from orb_simulation.environments import (
 )
 from orb_simulation.mock import MockSimulator
 from orb_simulation.scenarios import SCENARIOS, get_scenario
+from orb_simulation.sensors import MockSensor
 
 __all__ = [
     "SCENARIOS",
+    "MockSensor",
     "MockSimulator",
     "empty",
     "get_scenario",
