@@ -645,10 +645,7 @@ brain = RobotBrain(robot)
 
 brain.observe()
 
-brain.execute(
-    "pick",
-    object="red_cup"
-)
+brain.execute("pick", object="red_cup")
 ```
 
 ```python
