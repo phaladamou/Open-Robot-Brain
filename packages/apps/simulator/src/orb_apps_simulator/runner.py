@@ -21,7 +21,12 @@ from orb_brain import (
     ReleaseSkill,
     WorldModel,
 )
-from orb_embodiment import FakeRobot
+from orb_embodiment import (
+    FULL_ARM_CAPABILITIES,
+    SHORT_ARM_CAPABILITIES,
+    WEAK_ARM_CAPABILITIES,
+    FakeRobot,
+)
 from orb_runtime import EventBus, Executor, StateStore
 from orb_simulation import MockSensor, get_scenario
 from orb_types import (
@@ -31,6 +36,7 @@ from orb_types import (
     Observation,
     RunResult,
     RunStatus,
+    Scenario,
     Task,
     TaskId,
     new_id,
@@ -39,13 +45,15 @@ from orb_types import (
 
 logger = structlog.get_logger(__name__)
 
-DEFAULT_CAPABILITIES: tuple[str, ...] = (
-    "can_navigate",
-    "can_manipulate",
-    "can_grasp",
-    "can_lift",
-    "can_see",
-)
+DEFAULT_CAPABILITIES: tuple[str, ...] = FULL_ARM_CAPABILITIES
+"""Capabilities of the default reference body."""
+
+ROBOT_CAPABILITIES: dict[str, tuple[str, ...]] = {
+    "mock": FULL_ARM_CAPABILITIES,
+    "short_arm": SHORT_ARM_CAPABILITIES,
+    "weak_arm": WEAK_ARM_CAPABILITIES,
+}
+"""Body name (``Scenario.robot_id``) → capability set."""
 
 PERCEPTION_TICKS: int = 3
 """Perception ticks before planning. Each tick re-senses the world."""
@@ -55,6 +63,15 @@ PERCEPTION_SEED: int = 7
 
 PERCEPTION_POSITION_NOISE_M: float = 0.001
 """Sensor pose noise half-range in meters (1 mm)."""
+
+
+def _resolve_capabilities(scenario: Scenario) -> tuple[str, ...]:
+    """Return the capability set for the scenario's body."""
+    body = str(scenario.robot_id) if scenario.robot_id is not None else "mock"
+    if body not in ROBOT_CAPABILITIES:
+        msg = f"unknown robot body: {body!r} (known: {', '.join(sorted(ROBOT_CAPABILITIES))})"
+        raise KeyError(msg)
+    return ROBOT_CAPABILITIES[body]
 
 
 def _register_skills(registry: InMemorySkillRegistry) -> None:
@@ -128,7 +145,7 @@ def run_scenario(scenario_name: str) -> RunResult:
     robot = FakeRobot(
         robot_id=scenario.robot_id,
         name=f"Simulated {scenario.robot_id}",
-        capabilities=DEFAULT_CAPABILITIES,
+        capabilities=_resolve_capabilities(scenario),
         kind="arm",
     )
 
@@ -177,7 +194,7 @@ def run_scenario(scenario_name: str) -> RunResult:
         created_at=utc_now(),
         updated_at=utc_now(),
     )
-    task_result = executor.execute(task, world=store.world)
+    task_result = executor.execute(task, world=store.world, capabilities=robot.capabilities())
 
     duration = time.perf_counter() - started
     status = (
@@ -209,5 +226,6 @@ __all__ = [
     "PERCEPTION_POSITION_NOISE_M",
     "PERCEPTION_SEED",
     "PERCEPTION_TICKS",
+    "ROBOT_CAPABILITIES",
     "run_scenario",
 ]

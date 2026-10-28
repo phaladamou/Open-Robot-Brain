@@ -4,16 +4,17 @@ from __future__ import annotations
 
 import pytest
 from orb_apps_simulator import run_scenario
-from orb_simulation import SCENARIOS
+from orb_simulation import SCENARIOS, get_scenario
 from orb_types import RunStatus
 
 
 @pytest.mark.parametrize("name", SCENARIOS)
-def test_every_scenario_runs_and_succeeds(name: str) -> None:
+def test_every_scenario_reaches_expected_status(name: str) -> None:
+    expected = get_scenario(name).metadata.get("expected_status", "succeeded")
     result = run_scenario(name)
     assert result.scenario_name == name
-    assert result.status is RunStatus.SUCCEEDED, (
-        f"scenario {name} failed: status={result.status}, message={result.message}"
+    assert result.status.value == expected, (
+        f"scenario {name}: status={result.status}, message={result.message}"
     )
 
 
@@ -28,6 +29,33 @@ def test_observations_applied_is_deterministic() -> None:
     r2 = run_scenario("pick_red_cube")
     assert r1.observations_applied == r2.observations_applied
     assert r1.observations_applied >= 1
+
+
+# ─── Cross-embodiment ────────────────────────────────────────────────────
+
+
+def test_no_lift_body_refused_with_explicit_error() -> None:
+    result = run_scenario("pick_red_cube_no_lift")
+    assert result.status is RunStatus.REASONING_FAILED
+    assert result.reasoning is not None
+    assert not result.reasoning.ok
+    assert "can_lift" in (result.message or "")
+    assert result.plan is None
+
+
+def test_short_arm_succeeds_with_docking_plan() -> None:
+    result = run_scenario("pick_red_cube_short_arm")
+    assert result.status is RunStatus.SUCCEEDED
+    assert result.plan is not None
+    assert [s.skill_id for s in result.plan.steps] == [
+        "navigate_to",
+        "navigate_to",
+        "reach",
+        "grasp",
+        "lift",
+    ]
+    assert result.task_result is not None
+    assert len(result.task_result.skill_results) == 5
 
 
 def test_run_result_has_goal_reasoning_plan() -> None:

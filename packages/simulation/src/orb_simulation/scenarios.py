@@ -80,6 +80,31 @@ def _pick_cube_among_many() -> Scenario:
     )
 
 
+def _pick_red_cube_no_lift() -> Scenario:
+    return Scenario(
+        name="pick_red_cube_no_lift",
+        instruction="pick the red cube",
+        world=table_with_cube(color="red"),
+        robot_id=RobotId("weak_arm"),
+        metadata={
+            "kind": "pick",
+            "difficulty": "easy",
+            "expected_status": "reasoning_failed",
+            "reason": "weak_arm lacks can_lift",
+        },
+    )
+
+
+def _pick_red_cube_short_arm() -> Scenario:
+    return Scenario(
+        name="pick_red_cube_short_arm",
+        instruction="pick the red cube",
+        world=table_with_cube(color="red"),
+        robot_id=RobotId("short_arm"),
+        metadata={"kind": "pick", "difficulty": "medium"},
+    )
+
+
 # ─── Registry ────────────────────────────────────────────────────────────
 
 _SCENARIOS: dict[str, Callable[[], Scenario]] = {
@@ -88,6 +113,8 @@ _SCENARIOS: dict[str, Callable[[], Scenario]] = {
     "place_cube_on_table": _place_cube_on_table,
     "open_drawer": _open_drawer,
     "pick_cube_among_many": _pick_cube_among_many,
+    "pick_red_cube_no_lift": _pick_red_cube_no_lift,
+    "pick_red_cube_short_arm": _pick_red_cube_short_arm,
 }
 
 #: Names of all known scenarios.
