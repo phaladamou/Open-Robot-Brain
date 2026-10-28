@@ -17,6 +17,19 @@ def test_every_scenario_runs_and_succeeds(name: str) -> None:
     )
 
 
+@pytest.mark.parametrize("name", SCENARIOS)
+def test_every_scenario_applies_perception_observations(name: str) -> None:
+    result = run_scenario(name)
+    assert result.observations_applied >= 1, f"scenario {name}: world model treated no observation"
+
+
+def test_observations_applied_is_deterministic() -> None:
+    r1 = run_scenario("pick_red_cube")
+    r2 = run_scenario("pick_red_cube")
+    assert r1.observations_applied == r2.observations_applied
+    assert r1.observations_applied >= 1
+
+
 def test_run_result_has_goal_reasoning_plan() -> None:
     result = run_scenario("pick_red_cube")
     assert result.goal is not None

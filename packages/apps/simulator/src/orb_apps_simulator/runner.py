@@ -19,11 +19,16 @@ from orb_brain import (
     ReachSkill,
     Reasoner,
     ReleaseSkill,
+    WorldModel,
 )
 from orb_embodiment import FakeRobot
 from orb_runtime import EventBus, Executor, StateStore
-from orb_simulation import get_scenario
+from orb_simulation import MockSensor, get_scenario
 from orb_types import (
+    Event,
+    EventId,
+    EventKind,
+    Observation,
     RunResult,
     RunStatus,
     Task,
@@ -42,6 +47,15 @@ DEFAULT_CAPABILITIES: tuple[str, ...] = (
     "can_see",
 )
 
+PERCEPTION_TICKS: int = 3
+"""Perception ticks before planning. Each tick re-senses the world."""
+
+PERCEPTION_SEED: int = 7
+"""Fixed sensor seed: perception is deterministic across runs."""
+
+PERCEPTION_POSITION_NOISE_M: float = 0.001
+"""Sensor pose noise half-range in meters (1 mm)."""
+
 
 def _register_skills(registry: InMemorySkillRegistry) -> None:
     registry.register_many(
@@ -56,12 +70,60 @@ def _register_skills(registry: InMemorySkillRegistry) -> None:
     )
 
 
+def _publish_observation(bus: EventBus, obs: Observation) -> None:
+    """Publish one observation following the v0.1 bus convention."""
+    bus.publish(
+        Event(
+            event_id=EventId(new_id("evt")),
+            kind=EventKind.OBSERVATION_CREATED,
+            timestamp=utc_now(),
+            source="perception",
+            payload={"observation": obs},
+        )
+    )
+
+
+def _run_perception_ticks(bus: EventBus, store: StateStore) -> int:
+    """Sense the world and let the world model absorb it.
+
+    Returns the number of observations applied, counted as the
+    ``WORLD_UPDATED`` events published while the sensor ticks. The bus is
+    synchronous, so every published observation is applied before this
+    returns.
+    """
+    applied = 0
+
+    def _count_applied(event: Event) -> None:
+        nonlocal applied
+        applied += 1
+
+    sensor = MockSensor(
+        position_noise=PERCEPTION_POSITION_NOISE_M,
+        seed=PERCEPTION_SEED,
+    )
+    counter = bus.subscribe(_count_applied, kind=EventKind.WORLD_UPDATED)
+    try:
+        for _ in range(PERCEPTION_TICKS):
+            for obs in sensor.sense(store.world):
+                _publish_observation(bus, obs)
+    finally:
+        bus.unsubscribe(counter)
+    return applied
+
+
 def run_scenario(scenario_name: str) -> RunResult:
     started = time.perf_counter()
 
     scenario = get_scenario(scenario_name)
     bus = EventBus()
     store = StateStore(bus, initial_world=scenario.world)
+
+    # Real perception loop: the world model stays subscribed for the whole
+    # run and absorbs sensor ticks before planning. Everything here is
+    # function-scoped, so no explicit stop is needed.
+    model = WorldModel(bus, store)
+    model.start()
+    observations_applied = _run_perception_ticks(bus, store)
 
     robot = FakeRobot(
         robot_id=scenario.robot_id,
@@ -88,6 +150,7 @@ def run_scenario(scenario_name: str) -> RunResult:
             status=RunStatus.PARSE_FAILED,
             duration_s=duration,
             message=str(exc),
+            observations_applied=observations_applied,
         )
 
     reasoning = reasoner.reason(goal, store.world)
@@ -105,6 +168,7 @@ def run_scenario(scenario_name: str) -> RunResult:
             goal=goal,
             reasoning=reasoning,
             message="; ".join(reasoning.errors) or "reasoning rejected the goal",
+            observations_applied=observations_applied,
         )
 
     task = Task(
@@ -136,7 +200,14 @@ def run_scenario(scenario_name: str) -> RunResult:
         plan=task_result.plan,
         task_result=task_result,
         message=task_result.message,
+        observations_applied=observations_applied,
     )
 
 
-__all__ = ["DEFAULT_CAPABILITIES", "run_scenario"]
+__all__ = [
+    "DEFAULT_CAPABILITIES",
+    "PERCEPTION_POSITION_NOISE_M",
+    "PERCEPTION_SEED",
+    "PERCEPTION_TICKS",
+    "run_scenario",
+]
