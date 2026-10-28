@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/status-early%20research-orange" alt="Status"/>
+  <img src="https://img.shields.io/badge/v0.2.0-released-green" alt="Release"/>
   <img src="https://github.com/phaladamou/Open-Robot-Brain/actions/workflows/ci.yml/badge.svg" alt="CI"/>
   <img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"/>
   <img src="https://img.shields.io/badge/python-3.11+-blue" alt="Python"/>
@@ -923,6 +923,18 @@ If you use Open Robot Brain in academic work, please cite:
   note         = {Early research project}
 }
 ```
+
+---
+
+## Documentation
+
+- [Research whitepaper](docs/research/whitepaper.md) — thesis, architecture,
+  cross-embodiment results, limitations (v0.2).
+- [Design principles](docs/architecture/principles.md) — the 8 load-bearing rules.
+- [Architecture overview](docs/architecture/overview.md) — layers, data flow,
+  cross-embodiment.
+- [Changelog](CHANGELOG.md) — v0.1.0 and v0.2.0 release notes.
+- [AGENTS.md](AGENTS.md) — onboarding for agents and humans (stack, commands, roadmap).
 
 ---
 
