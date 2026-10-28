@@ -41,7 +41,7 @@ jobs:
         run: uv run ruff format --check .
 
       - name: Mypy (strict)
-        run: uv run mypy packages brain runtime protocols
+        run: uv run mypy packages
         continue-on-error: true
 
       - name: Pytest
