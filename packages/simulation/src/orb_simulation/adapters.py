@@ -135,13 +135,15 @@ class MujocoAdapter:
                     model_path=str(self._model_path),
                     joint_id=joint_id,
                 )
-            view = self._model.joint(name)
-            if len(view.qposadr) != 1 or len(view.dofadr) != 1:
+            joint_type = int(self._model.jnt_type[joint_id])
+            one_dof = (mujoco.mjtJoint.mjJNT_HINGE, mujoco.mjtJoint.mjJNT_SLIDE)
+            if joint_type not in one_dof:
                 raise ConfigurationError(
                     f"Joint {name!r} is not 1-DoF; only hinge/slide joints are supported",
                     model_path=str(self._model_path),
                     joint=name,
                 )
+            view = self._model.joint(name)
             actuator_id = mujoco.mj_name2id(self._model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
             if actuator_id < 0:
                 raise ConfigurationError(
