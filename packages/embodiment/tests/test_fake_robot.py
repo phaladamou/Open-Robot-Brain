@@ -29,6 +29,7 @@ def test_fake_robot_default_capabilities() -> None:
     assert caps.has("can_lift")
     assert caps.has("can_see")
     assert caps.has("can_manipulate")
+    assert caps.has("can_reach_far")
 
 
 def test_fake_robot_custom_capabilities() -> None:

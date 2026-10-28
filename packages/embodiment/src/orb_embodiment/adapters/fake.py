@@ -28,6 +28,7 @@ _DEFAULT_CAPABILITIES: tuple[tuple[str, CapabilityKind], ...] = (
     ("can_grasp", CapabilityKind.MANIPULATION),
     ("can_lift", CapabilityKind.MANIPULATION),
     ("can_see", CapabilityKind.PERCEPTION),
+    ("can_reach_far", CapabilityKind.MANIPULATION),
 )
 
 
@@ -42,7 +43,7 @@ class FakeRobot(BaseRobot):
         Human-readable name. Defaults to ``"Fake Robot"``.
     capabilities:
         Optional capability names to expose. If ``None``, a default set
-        (navigate, manipulate, grasp, lift, see) is used.
+        (navigate, manipulate, grasp, lift, see, reach_far) is used.
     kind:
         Optional coarse kind (``"arm"``, ``"mobile"``, ``"humanoid"``).
     """
